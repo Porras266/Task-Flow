@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 class TaskViewModel : ViewModel() {
 
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
-
     val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
 
     fun addTask(
@@ -27,19 +26,46 @@ class TaskViewModel : ViewModel() {
         _tasks.value = _tasks.value + newTask
     }
 
+    fun updateTask(
+        id: Int,
+        title: String,
+        description: String,
+        priority: String
+    ) {
+        _tasks.value = _tasks.value.map { task ->
+            if (task.id == id) {
+                task.copy(
+                    title = title,
+                    description = description,
+                    priority = priority
+                )
+            } else {
+                task
+            }
+        }
+    }
+
     fun deleteTask(id: Int) {
-        _tasks.value = _tasks.value.filter {
-            it.id != id
+        _tasks.value = _tasks.value.filter { task ->
+            task.id != id
         }
     }
 
     fun toggleCompleted(id: Int) {
-        _tasks.value = _tasks.value.map {
-            if (it.id == id) {
-                it.copy(isCompleted = !it.isCompleted)
+        _tasks.value = _tasks.value.map { task ->
+            if (task.id == id) {
+                task.copy(
+                    isCompleted = !task.isCompleted
+                )
             } else {
-                it
+                task
             }
+        }
+    }
+
+    fun getTaskById(id: Int): Task? {
+        return _tasks.value.find { task ->
+            task.id == id
         }
     }
 }
